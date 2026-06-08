@@ -1,0 +1,2263 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+  html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+        :root {
+            --primary: #C9F31D;
+            --dark: #092837;
+            --light: #f5f7fa;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --border: #e0e0e0;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--dark);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed {
+            left: -260px;
+        }
+
+        .logo-section {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: 0.5px;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 15px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(201,243,29,0.1);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item span {
+            font-size: 15px;
+        }
+
+        .logout-section {
+            padding: 20px 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.05);
+            border: none;
+            width: 100%;
+            font-size: 15px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220,53,69,0.2);
+            color: #ff6b6b;
+        }
+
+        .logout-btn i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background: var(--white);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--dark);
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            width: 280px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(201,243,29,0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .notification:hover {
+            background: var(--light);
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 18px;
+            height: 18px;
+            background: #ff4757;
+            color: white;
+            font-size: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .user-profile:hover {
+            background: var(--light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 16px;
+        }
+
+        .user-info {
+            line-height: 1.3;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* ===== CONTENT SECTIONS ===== */
+        .content-section {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.green { background: rgba(201,243,29,0.2); color: #5a7d00; }
+        .stat-icon.blue { background: rgba(9,40,55,0.1); color: var(--dark); }
+        .stat-icon.orange { background: rgba(255,159,67,0.15); color: #e67e22; }
+        .stat-icon.purple { background: rgba(155,89,182,0.15); color: #9b59b6; }
+
+        .stat-trend {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .stat-trend.up { background: rgba(201,243,29,0.2); color: #5a7d00; }
+        .stat-trend.down { background: rgba(255,71,87,0.1); color: #ff4757; }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* ===== CHARTS ROW ===== */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .chart-filter {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            background: var(--white);
+            cursor: pointer;
+            outline: none;
+        }
+
+        .chart-area {
+            height: 280px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 10px 0;
+            gap: 8px;
+        }
+
+        .bar {
+            flex: 1;
+            background: var(--primary);
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s;
+            position: relative;
+            min-width: 30px;
+        }
+
+        .bar:hover {
+            background: var(--dark);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: var(--gray);
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .pie-chart {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--primary) 0% 35%,
+                var(--dark) 35% 60%,
+                #e0e0e0 60% 80%,
+                #ff9f43 80% 100%
+            );
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: var(--white);
+            border-radius: 50%;
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        /* ===== TABLE ===== */
+        .table-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #b8e018;
+            transform: translateY(-2px);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .data-table td {
+            padding: 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--light);
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(201,243,29,0.05);
+        }
+
+        .property-img {
+            width: 60px;
+            height: 45px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .property-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .property-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .property-location {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.active { background: rgba(201,243,29,0.2); color: #5a7d00; }
+        .status-badge.pending { background: rgba(255,159,67,0.15); color: #e67e22; }
+        .status-badge.sold { background: rgba(255,71,87,0.1); color: #ff4757; }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .action-btn.edit { background: rgba(201,243,29,0.2); color: #5a7d00; }
+        .action-btn.delete { background: rgba(255,71,87,0.1); color: #ff4757; }
+        .action-btn.view { background: rgba(9,40,55,0.1); color: var(--dark); }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* ===== SECTION CONTENT STYLES ===== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            text-align: center;
+        }
+
+        .info-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 16px;
+        }
+
+        .info-card h3 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .info-card p {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .form-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            max-width: 700px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(201,243,29,0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .settings-info p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: var(--border);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: var(--white);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+
+        /* ===== MESSAGES / LEADS ===== */
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px;
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .message-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .message-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .message-content h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .message-content p {
+            font-size: 13px;
+            color: var(--gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .message-meta {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .message-count {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            color: var(--dark);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 6px;
+            margin-left: auto;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { left: -260px; }
+            .sidebar.open { left: 0; }
+            .main-content { margin-left: 0; }
+            .hamburger { display: block; }
+            .search-box input { width: 200px; }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.4);
+                z-index: 999;
+            }
+            .overlay.show { display: block; }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .topbar { padding: 12px 16px; }
+            .content-section { padding: 16px; }
+            .search-box { display: none; }
+            .user-info { display: none; }
+            .data-table { display: block; overflow-x: auto; }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(9,40,55,0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(9,40,55,0.4); }
+
+    @media (max-width: 768px) {
+
+    .chart-card {
+        overflow: hidden;
+        padding: 15px;
+    }
+
+    .chart-area {
+        min-width: auto;
+        width: 100%;
+        height: 220px;
+        gap: 2px;
+        justify-content: space-between;
+    }
+
+    .bar {
+        flex: 1;
+        min-width: 0;
+        max-width: 18px;
+    }
+
+    .bar-label,
+    .bar-value {
+        font-size: 8px;
+    }
+}
+
+
+@media (max-width: 576px) {
+
+    .charts-row {
+        gap: 15px;
+    }
+
+    .chart-title {
+        font-size: 16px;
+    }
+
+    .chart-filter {
+        width: 100%;
+    }
+
+    .table-card,
+    .chart-card,
+    .stat-card {
+        overflow: hidden;
+    }
+}
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+     <div class="logo-section">
+    <a href="index.html">
+        <img src="images/logo-new.webp" alt="Logo" class="sidebar-logo">
+    </a>
+</div>
+
+        <nav class="nav-menu">
+            <div class="nav-item active" data-section="dashboard">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-section="properties">
+                <i class="fas fa-home"></i>
+                <span>Properties</span>
+            </div>
+            <div class="nav-item" data-section="agents">
+                <i class="fas fa-user-tie"></i>
+                <span>Agents</span>
+            </div>
+            <div class="nav-item" data-section="leads">
+                <i class="fas fa-address-book"></i>
+                <span>Leads</span>
+            </div>
+            <div class="nav-item" data-section="analytics">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item" data-section="reviews">
+                <i class="fas fa-star"></i>
+                <span>Reviews</span>
+            </div>
+            <div class="nav-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </nav>
+
+        <div class="logout-section">
+            <button class="logout-btn" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content" id="mainContent">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">5</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                            <div class="user-name" id="userEmailDisplay"></div>
+                        <div class="user-role">Admin</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DASHBOARD SECTION ===== -->
+        <section class="content-section active" id="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon green"><i class="fas fa-home"></i></div>
+                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 12%</span>
+                    </div>
+                    <div class="stat-value">1,284</div>
+                    <div class="stat-label">Total Properties</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon blue"><i class="fas fa-hand-holding-usd"></i></div>
+                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 8%</span>
+                    </div>
+                    <div class="stat-value">$4.2M</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon orange"><i class="fas fa-users"></i></div>
+                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 15%</span>
+                    </div>
+                    <div class="stat-value">856</div>
+                    <div class="stat-label">Active Clients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon purple"><i class="fas fa-file-contract"></i></div>
+                        <span class="stat-trend down"><i class="fas fa-arrow-down"></i> 3%</span>
+                    </div>
+                    <div class="stat-value">342</div>
+                    <div class="stat-label">Deals Closed</div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Property Sales Overview</h3>
+                        <select class="chart-filter">
+                            <option>This Year</option>
+                            <option>Last Year</option>
+                        </select>
+                    </div>
+                    <div class="chart-area">
+                        <div class="bar" style="height: 45%;"><span class="bar-value">45</span><span class="bar-label">Jan</span></div>
+                        <div class="bar" style="height: 62%;"><span class="bar-value">62</span><span class="bar-label">Feb</span></div>
+                        <div class="bar" style="height: 55%;"><span class="bar-value">55</span><span class="bar-label">Mar</span></div>
+                        <div class="bar" style="height: 78%;"><span class="bar-value">78</span><span class="bar-label">Apr</span></div>
+                        <div class="bar" style="height: 85%;"><span class="bar-value">85</span><span class="bar-label">May</span></div>
+                        <div class="bar" style="height: 70%;"><span class="bar-value">70</span><span class="bar-label">Jun</span></div>
+                        <div class="bar" style="height: 92%;"><span class="bar-value">92</span><span class="bar-label">Jul</span></div>
+                        <div class="bar" style="height: 68%;"><span class="bar-value">68</span><span class="bar-label">Aug</span></div>
+                        <div class="bar" style="height: 80%;"><span class="bar-value">80</span><span class="bar-label">Sep</span></div>
+                        <div class="bar" style="height: 95%;"><span class="bar-value">95</span><span class="bar-label">Oct</span></div>
+                        <div class="bar" style="height: 72%;"><span class="bar-value">72</span><span class="bar-label">Nov</span></div>
+                        <div class="bar" style="height: 88%;"><span class="bar-value">88</span><span class="bar-label">Dec</span></div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Property Types</h3>
+                    </div>
+                    <div class="pie-chart"></div>
+                    <div class="pie-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--primary);"></div> Residential (35%)</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--dark);"></div> Commercial (25%)</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: #e0e0e0;"></div> Land (20%)</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: #ff9f43;"></div> Industrial (20%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-header">
+                    <h3 class="chart-title">Recent Properties</h3>
+                    <button class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-plus"></i> Add Property
+</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Type</th>
+                            <th>Price</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/ap-1.webp" class="property-img" alt="Property">
+                                    <div>
+                                        <div class="property-name">Luxury Villa</div>
+                                        <div class="property-location">5 Beds · 4 Baths</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Residential</td>
+                            <td><strong>$1,250,000</strong></td>
+                            <td>Beverly Hills, CA</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/ap-2.webp" class="property-img" alt="Property">
+                                    <div>
+                                        <div class="property-name">Modern Apartment</div>
+                                        <div class="property-location">3 Beds · 2 Baths</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Residential</td>
+                            <td><strong>$680,000</strong></td>
+                            <td>Manhattan, NY</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/ap-3.webp" class="property-img" alt="Property">
+                                    <div>
+                                        <div class="property-name">Office Complex</div>
+                                        <div class="property-location">12,000 sqft</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Commercial</td>
+                            <td><strong>$3,400,000</strong></td>
+                            <td>Chicago, IL</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/ap-4.webp" class="property-img" alt="Property">
+                                    <div>
+                                        <div class="property-name">Beach House</div>
+                                        <div class="property-location">4 Beds · 3 Baths</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Residential</td>
+                            <td><strong>$2,100,000</strong></td>
+                            <td>Miami Beach, FL</td>
+                            <td><span class="status-badge sold">Sold</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/ap-5.webp" class="property-img" alt="Property">
+                                    <div>
+                                        <div class="property-name">Penthouse Suite</div>
+                                        <div class="property-location">3 Beds · 3 Baths</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Residential</td>
+                            <td><strong>$4,500,000</strong></td>
+                            <td>San Francisco, CA</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ===== PROPERTIES SECTION ===== -->
+        <section class="content-section" id="properties">
+            <div class="section-header">
+                <h2 class="section-title">All Properties</h2>
+                <button type="button" class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-plus"></i> Add New Property
+</button>
+            </div>
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Type</th>
+                            <th>Price</th>
+                            <th>Location</th>
+                            <th>Agent</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/gallary-h1-1.webp" class="property-img" alt="">
+                                    <div>
+                                        <div class="property-name">Luxury Villa</div>
+                                        <div class="property-location">ID: #PRP-001</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Residential</td>
+                            <td><strong>$1,250,000</strong></td>
+                            <td>Beverly Hills, CA</td>
+                            <td>Sarah Johnson</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/gallary-h1-2.webp" class="property-img" alt="">
+                                    <div>
+                                        <div class="property-name">Modern Apartment</div>
+                                        <div class="property-location">ID: #PRP-002</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Residential</td>
+                            <td><strong>$680,000</strong></td>
+                            <td>Manhattan, NY</td>
+                            <td>Michael Chen</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/gallary-h1-3.webp" class="property-img" alt="">
+                                    <div>
+                                        <div class="property-name">Office Complex</div>
+                                        <div class="property-location">ID: #PRP-003</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Commercial</td>
+                            <td><strong>$3,400,000</strong></td>
+                            <td>Chicago, IL</td>
+                            <td>Emily Davis</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/gallary-h1-4.webp" class="property-img" alt="">
+                                    <div>
+                                        <div class="property-name">Beach House</div>
+                                        <div class="property-location">ID: #PRP-004</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Residential</td>
+                            <td><strong>$2,100,000</strong></td>
+                            <td>Miami Beach, FL</td>
+                            <td>James Wilson</td>
+                            <td><span class="status-badge sold">Sold</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/gallary-h1-5.webp" class="property-img" alt="">
+                                    <div>
+                                        <div class="property-name">Penthouse Suite</div>
+                                        <div class="property-location">ID: #PRP-005</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Residential</td>
+                            <td><strong>$4,500,000</strong></td>
+                            <td>San Francisco, CA</td>
+                            <td>Sarah Johnson</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <img src="images/resource/gallary-h1-6.webp" class="property-img" alt="">
+                                    <div>
+                                        <div class="property-name">Retail Space</div>
+                                        <div class="property-location">ID: #PRP-006</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Commercial</td>
+                            <td><strong>$1,800,000</strong></td>
+                            <td>Austin, TX</td>
+                            <td>Michael Chen</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>
+                               <div class="action-btns">
+    <button class="action-btn view" onclick="window.location.href='404.html'">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <button class="action-btn edit" onclick="window.location.href='404.html'">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="action-btn delete" onclick="window.location.href='404.html'">
+        <i class="fas fa-trash"></i>
+    </button>
+</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ===== AGENTS SECTION ===== -->
+        <section class="content-section" id="agents">
+            <div class="section-header">
+                <h2 class="section-title">Our Agents</h2>
+                <button type="button" class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-plus"></i> Add Agent
+</button>
+            </div>
+            <div class="cards-grid">
+                <div class="info-card">
+                    <div class="info-card-icon" style="background: rgba(201,243,29,0.2); color: #5a7d00;"><i class="fas fa-user-tie"></i></div>
+                    <h3>24</h3>
+                    <p>Total Agents</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon" style="background: rgba(9,40,55,0.1); color: var(--dark);"><i class="fas fa-chart-line"></i></div>
+                    <h3>186</h3>
+                    <p>Deals This Month</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon" style="background: rgba(255,159,67,0.15); color: #e67e22;"><i class="fas fa-star"></i></div>
+                    <h3>4.8</h3>
+                    <p>Average Rating</p>
+                </div>
+            </div>
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Properties</th>
+                            <th>Sales</th>
+                            <th>Rating</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <div class="message-avatar" style="width:40px;height:40px;font-size:14px;">SJ</div>
+                                    <div>
+                                        <div class="property-name">Sarah Johnson</div>
+                                        <div class="property-location">Senior Agent</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>sarah@realestate.com</td>
+                            <td>+1 (555) 123-4567</td>
+                            <td>42</td>
+                            <td>$12.5M</td>
+                            <td><i class="fas fa-star" style="color:#ff9f43;"></i> 4.9</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <div class="message-avatar" style="width:40px;height:40px;font-size:14px;background:var(--dark);color:var(--primary);">MC</div>
+                                    <div>
+                                        <div class="property-name">Michael Chen</div>
+                                        <div class="property-location">Agent</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>michael@realestate.com</td>
+                            <td>+1 (555) 234-5678</td>
+                            <td>35</td>
+                            <td>$9.8M</td>
+                            <td><i class="fas fa-star" style="color:#ff9f43;"></i> 4.7</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <div class="message-avatar" style="width:40px;height:40px;font-size:14px;background:#ff9f43;color:white;">ED</div>
+                                    <div>
+                                        <div class="property-name">Emily Davis</div>
+                                        <div class="property-location">Agent</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>emily@realestate.com</td>
+                            <td>+1 (555) 345-6789</td>
+                            <td>28</td>
+                            <td>$7.2M</td>
+                            <td><i class="fas fa-star" style="color:#ff9f43;"></i> 4.8</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="property-info">
+                                    <div class="message-avatar" style="width:40px;height:40px;font-size:14px;background:#9b59b6;color:white;">JW</div>
+                                    <div>
+                                        <div class="property-name">James Wilson</div>
+                                        <div class="property-location">Junior Agent</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>james@realestate.com</td>
+                            <td>+1 (555) 456-7890</td>
+                            <td>15</td>
+                            <td>$3.5M</td>
+                            <td><i class="fas fa-star" style="color:#ff9f43;"></i> 4.5</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ===== LEADS SECTION ===== -->
+        <section class="content-section" id="leads">
+            <div class="section-header">
+                <h2 class="section-title">Leads Management</h2>
+             <button type="button" class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-plus"></i> Add Lead
+</button>
+            </div>
+            <div class="cards-grid">
+                <div class="info-card">
+                    <div class="info-card-icon" style="background: rgba(201,243,29,0.2); color: #5a7d00;"><i class="fas fa-user-plus"></i></div>
+                    <h3>342</h3>
+                    <p>New Leads</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon" style="background: rgba(9,40,55,0.1); color: var(--dark);"><i class="fas fa-phone"></i></div>
+                    <h3>128</h3>
+                    <p>Contacted</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon" style="background: rgba(255,159,67,0.15); color: #e67e22;"><i class="fas fa-handshake"></i></div>
+                    <h3>56</h3>
+                    <p>Converted</p>
+                </div>
+            </div>
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Interest</th>
+                            <th>Budget</th>
+                            <th>Source</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Robert Taylor</strong></td>
+                            <td>robert.t@email.com</td>
+                            <td>+1 (555) 111-2222</td>
+                            <td>Luxury Villa</td>
+                            <td>$1M - $2M</td>
+                            <td>Website</td>
+                            <td><span class="status-badge active">Hot</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lisa Anderson</strong></td>
+                            <td>lisa.a@email.com</td>
+                            <td>+1 (555) 222-3333</td>
+                            <td>Apartment</td>
+                            <td>$500K - $800K</td>
+                            <td>Referral</td>
+                            <td><span class="status-badge pending">Warm</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>David Martinez</strong></td>
+                            <td>david.m@email.com</td>
+                            <td>+1 (555) 333-4444</td>
+                            <td>Commercial</td>
+                            <td>$2M - $5M</td>
+                            <td>Social Media</td>
+                            <td><span class="status-badge active">Hot</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jennifer Lee</strong></td>
+                            <td>jennifer.l@email.com</td>
+                            <td>+1 (555) 444-5555</td>
+                            <td>Beach House</td>
+                            <td>$1.5M - $3M</td>
+                            <td>Website</td>
+                            <td><span class="status-badge pending">Warm</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mark Thompson</strong></td>
+                            <td>mark.t@email.com</td>
+                            <td>+1 (555) 555-6666</td>
+                            <td>Land</td>
+                            <td>$300K - $600K</td>
+                            <td>Walk-in</td>
+                            <td><span class="status-badge sold">Cold</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+
+        
+
+        <!-- ===== ANALYTICS SECTION ===== -->
+        <section class="content-section" id="analytics">
+
+    <div class="section-header">
+        <h2 class="section-title">Analytics Overview</h2>
+
+        <select class="chart-filter">
+            <option>This Month</option>
+            <option>Last Month</option>
+            <option>This Year</option>
+        </select>
+    </div>
+
+    <!-- Analytics Cards -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon green">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <span class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i> 24%
+                </span>
+            </div>
+            <div class="stat-value">48.2K</div>
+            <div class="stat-label">Page Views</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon blue">
+                    <i class="fas fa-mouse-pointer"></i>
+                </div>
+                <span class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i> 18%
+                </span>
+            </div>
+            <div class="stat-value">3.8K</div>
+            <div class="stat-label">Clicks</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon orange">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <span class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i> 12%
+                </span>
+            </div>
+            <div class="stat-value">1,258</div>
+            <div class="stat-label">New Leads</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon purple">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <span class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i> 9%
+                </span>
+            </div>
+            <div class="stat-value">342</div>
+            <div class="stat-label">Deals Closed</div>
+        </div>
+
+    </div>
+
+    <!-- Revenue & Lead Sources -->
+    <div class="charts-row">
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+                <h3 class="chart-title">Revenue Analytics</h3>
+
+                <select class="chart-filter">
+                    <option>2025</option>
+                    <option>2024</option>
+                </select>
+            </div>
+
+            <div class="chart-area">
+
+                <div class="bar" style="height:50%">
+                    <span class="bar-value">$50K</span>
+                    <span class="bar-label">Jan</span>
+                </div>
+
+                <div class="bar" style="height:60%">
+                    <span class="bar-value">$60K</span>
+                    <span class="bar-label">Feb</span>
+                </div>
+
+                <div class="bar" style="height:75%">
+                    <span class="bar-value">$75K</span>
+                    <span class="bar-label">Mar</span>
+                </div>
+
+                <div class="bar" style="height:65%">
+                    <span class="bar-value">$65K</span>
+                    <span class="bar-label">Apr</span>
+                </div>
+
+                <div class="bar" style="height:85%">
+                    <span class="bar-value">$85K</span>
+                    <span class="bar-label">May</span>
+                </div>
+
+                <div class="bar" style="height:90%">
+                    <span class="bar-value">$90K</span>
+                    <span class="bar-label">Jun</span>
+                </div>
+
+                <div class="bar" style="height:80%">
+                    <span class="bar-value">$80K</span>
+                    <span class="bar-label">Jul</span>
+                </div>
+
+                <div class="bar" style="height:95%">
+                    <span class="bar-value">$95K</span>
+                    <span class="bar-label">Aug</span>
+                </div>
+
+                <div class="bar" style="height:100%">
+                    <span class="bar-value">$100K</span>
+                    <span class="bar-label">Sep</span>
+                </div>
+
+                <div class="bar" style="height:88%">
+                    <span class="bar-value">$88K</span>
+                    <span class="bar-label">Oct</span>
+                </div>
+
+                <div class="bar" style="height:78%">
+                    <span class="bar-value">$78K</span>
+                    <span class="bar-label">Nov</span>
+                </div>
+
+                <div class="bar" style="height:92%">
+                    <span class="bar-value">$92K</span>
+                    <span class="bar-label">Dec</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+                <h3 class="chart-title">Lead Sources</h3>
+            </div>
+
+            <div class="pie-chart"></div>
+
+            <div class="pie-legend">
+
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:var(--primary)"></div>
+                    Website (40%)
+                </div>
+
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:var(--dark)"></div>
+                    Social Media (25%)
+                </div>
+
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#ff9f43"></div>
+                    Referral (20%)
+                </div>
+
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#e0e0e0"></div>
+                    Walk-In (15%)
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Performance Table -->
+
+    <div class="table-card">
+
+        <div class="table-header">
+            <h3 class="chart-title">Top Performing Agents</h3>
+        </div>
+
+        <table class="data-table">
+
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Properties Sold</th>
+                    <th>Revenue</th>
+                    <th>Leads Converted</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>Sarah Johnson</td>
+                    <td>42</td>
+                    <td>$12.5M</td>
+                    <td>86</td>
+                    <td>4.9 ★</td>
+                </tr>
+
+                <tr>
+                    <td>Michael Chen</td>
+                    <td>35</td>
+                    <td>$9.8M</td>
+                    <td>72</td>
+                    <td>4.8 ★</td>
+                </tr>
+
+                <tr>
+                    <td>Emily Davis</td>
+                    <td>28</td>
+                    <td>$7.2M</td>
+                    <td>64</td>
+                    <td>4.7 ★</td>
+                </tr>
+
+                <tr>
+                    <td>James Wilson</td>
+                    <td>15</td>
+                    <td>$3.5M</td>
+                    <td>31</td>
+                    <td>4.5 ★</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Conversion Metrics -->
+
+    <div class="cards-grid" style="margin-top:30px;">
+
+        <div class="info-card">
+            <div class="info-card-icon" style="background:rgba(201,243,29,.2);color:#5a7d00;">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <h3>68%</h3>
+            <p>Lead Conversion Rate</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-icon" style="background:rgba(9,40,55,.1);color:var(--dark);">
+                <i class="fas fa-home"></i>
+            </div>
+            <h3>1,284</h3>
+            <p>Total Properties Listed</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-icon" style="background:rgba(255,159,67,.15);color:#e67e22;">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <h3>$4.2M</h3>
+            <p>Total Revenue Generated</p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===== REVIEWS SECTION ===== -->
+<section class="content-section" id="reviews">
+
+    <div class="section-header">
+        <h2 class="section-title">Customer Reviews</h2>
+
+       <button type="button" class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-download"></i> Export Reviews
+</button>
+    </div>
+
+    <div class="cards-grid">
+
+        <div class="info-card">
+            <div class="info-card-icon" style="background:rgba(201,243,29,.2);color:#5a7d00;">
+                <i class="fas fa-star"></i>
+            </div>
+            <h3>4.8</h3>
+            <p>Average Rating</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-icon" style="background:rgba(9,40,55,.1);color:var(--dark);">
+                <i class="fas fa-comment"></i>
+            </div>
+            <h3>1,248</h3>
+            <p>Total Reviews</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-icon" style="background:rgba(255,159,67,.15);color:#e67e22;">
+                <i class="fas fa-thumbs-up"></i>
+            </div>
+            <h3>96%</h3>
+            <p>Positive Feedback</p>
+        </div>
+
+    </div>
+
+    <div class="table-card">
+
+        <div class="table-header">
+            <h3 class="chart-title">Latest Reviews</h3>
+        </div>
+
+        <table class="data-table">
+
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Property</th>
+                    <th>Agent</th>
+                    <th>Rating</th>
+                    <th>Review</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>Robert Taylor</td>
+                    <td>Luxury Villa</td>
+                    <td>Sarah Johnson</td>
+                    <td>★★★★★</td>
+                    <td>Excellent service and smooth process.</td>
+                    <td><span class="status-badge active">Approved</span></td>
+                </tr>
+
+                <tr>
+                    <td>Lisa Anderson</td>
+                    <td>Modern Apartment</td>
+                    <td>Michael Chen</td>
+                    <td>★★★★☆</td>
+                    <td>Very professional and responsive.</td>
+                    <td><span class="status-badge active">Approved</span></td>
+                </tr>
+
+                <tr>
+                    <td>David Martinez</td>
+                    <td>Office Complex</td>
+                    <td>Emily Davis</td>
+                    <td>★★★★★</td>
+                    <td>Great experience from start to finish.</td>
+                    <td><span class="status-badge pending">Pending</span></td>
+                </tr>
+
+                <tr>
+                    <td>Jennifer Lee</td>
+                    <td>Beach House</td>
+                    <td>James Wilson</td>
+                    <td>★★★★☆</td>
+                    <td>Property exactly as advertised.</td>
+                    <td><span class="status-badge active">Approved</span></td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+<!-- ===== SETTINGS SECTION ===== -->
+<section class="content-section" id="settings">
+
+    <div class="section-header">
+        <h2 class="section-title">Settings</h2>
+
+        <button type="button" class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-save"></i> Save Changes
+</button>
+    </div>
+    <div class="table-card">
+
+        <div class="settings-item">
+            <div class="settings-info">
+                <h4>Email Notifications</h4>
+                <p>Receive notifications for new leads and bookings.</p>
+            </div>
+            <div class="toggle-switch active"></div>
+        </div>
+
+        <div class="settings-item">
+            <div class="settings-info">
+                <h4>SMS Alerts</h4>
+                <p>Send SMS notifications to agents and customers.</p>
+            </div>
+            <div class="toggle-switch"></div>
+        </div>
+
+        <div class="settings-item">
+            <div class="settings-info">
+                <h4>Dark Mode</h4>
+                <p>Enable dark theme for admin dashboard.</p>
+            </div>
+            <div class="toggle-switch"></div>
+        </div>
+
+        <div class="settings-item">
+            <div class="settings-info">
+                <h4>Property Auto Approval</h4>
+                <p>Automatically approve newly listed properties.</p>
+            </div>
+            <div class="toggle-switch active"></div>
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="form-card">
+
+        <h3 style="margin-bottom:20px;">Website Settings</h3>
+
+        <div class="form-group">
+            <label>Website Name</label>
+            <input type="text" value="RealEstate">
+        </div>
+
+        <div class="form-group">
+            <label>Admin Email</label>
+            <input type="email" value="admin@realestate.com">
+        </div>
+
+        <div class="form-group">
+            <label>Contact Number</label>
+            <input type="text" value="+91 123-123-4567">
+        </div>
+
+        <div class="form-group">
+            <label>Address</label>
+            <textarea rows="4">123 Business Street, New York, USA</textarea>
+        </div>
+
+       <button type="button" class="btn-primary" onclick="window.location.href='404.html'">
+    Update Settings
+</button>
+
+    </div>
+
+</section>
+
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const email = localStorage.getItem("userEmail");
+    const loginTime = localStorage.getItem("loginTime");
+
+    document.getElementById("userEmailDisplay").innerText =
+        email ? email : "Guest User";
+
+    document.getElementById("loginTimeDisplay").innerText =
+        loginTime ? "Login: " + loginTime : "Not Logged In";
+});
+
+function handleLogout() {
+
+    // Clear login session
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("loginTime");
+
+    // Redirect to login page
+    window.location.href = "login.html";
+}
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const navItems = document.querySelectorAll(".nav-item");
+    const sections = document.querySelectorAll(".content-section");
+    const pageTitle = document.getElementById("pageTitle");
+
+    navItems.forEach(item => {
+
+        item.addEventListener("click", function () {
+
+            navItems.forEach(nav => nav.classList.remove("active"));
+
+            this.classList.add("active");
+
+            const sectionId = this.getAttribute("data-section");
+
+            sections.forEach(section => {
+                section.classList.remove("active");
+            });
+
+            const activeSection = document.getElementById(sectionId);
+
+            if(activeSection){
+                activeSection.classList.add("active");
+            }
+
+            pageTitle.innerText =
+                this.querySelector("span").innerText;
+
+            if(window.innerWidth < 992){
+                sidebar.classList.remove("open");
+                overlay.classList.remove("show");
+            }
+        });
+
+    });
+
+});
+
+const hamburger = document.getElementById("hamburger");
+
+hamburger.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
+});
+
+overlay.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
+});
+</script>
+
+<script>
+    document.querySelectorAll(".toggle-switch").forEach(toggle => {
+    toggle.addEventListener("click", () => {
+        toggle.classList.toggle("active");
+    });
+});
+</script>
+
+</body>
+</html>

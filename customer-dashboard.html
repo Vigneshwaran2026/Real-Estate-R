@@ -1,0 +1,2555 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Customer Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+          html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+        :root {
+            --primary: #C9F31D;
+            --dark: #092837;
+            --light: #f5f7fa;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --border: #e0e0e0;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--dark);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed {
+            left: -260px;
+        }
+
+        .logo-section {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: 0.5px;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 15px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(201,243,29,0.1);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item span {
+            font-size: 15px;
+        }
+
+        .logout-section {
+            padding: 20px 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.05);
+            border: none;
+            width: 100%;
+            font-size: 15px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220,53,69,0.2);
+            color: #ff6b6b;
+        }
+
+        .logout-btn i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background: var(--white);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--dark);
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            width: 280px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(201,243,29,0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .notification:hover {
+            background: var(--light);
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 18px;
+            height: 18px;
+            background: #ff4757;
+            color: white;
+            font-size: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .user-profile:hover {
+            background: var(--light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 16px;
+        }
+
+        .user-info {
+            line-height: 1.3;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* ===== CONTENT SECTIONS ===== */
+        .content-section {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.green { background: rgba(201,243,29,0.2); color: #5a7d00; }
+        .stat-icon.blue { background: rgba(9,40,55,0.1); color: var(--dark); }
+        .stat-icon.orange { background: rgba(255,159,67,0.15); color: #e67e22; }
+        .stat-icon.purple { background: rgba(155,89,182,0.15); color: #9b59b6; }
+        .stat-icon.red { background: rgba(255,71,87,0.1); color: #ff4757; }
+
+        .stat-trend {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .stat-trend.up { background: rgba(201,243,29,0.2); color: #5a7d00; }
+        .stat-trend.down { background: rgba(255,71,87,0.1); color: #ff4757; }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* ===== CHARTS ROW ===== */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .chart-filter {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            background: var(--white);
+            cursor: pointer;
+            outline: none;
+        }
+
+        .chart-area {
+            height: 280px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 10px 0;
+            gap: 8px;
+        }
+
+        .bar {
+            flex: 1;
+            background: var(--primary);
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s;
+            position: relative;
+            min-width: 30px;
+        }
+
+        .bar:hover {
+            background: var(--dark);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: var(--gray);
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .pie-chart {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--primary) 0% 45%,
+                var(--dark) 45% 75%,
+                #ff9f43 75% 90%,
+                #e0e0e0 90% 100%
+            );
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .pie-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: var(--white);
+            border-radius: 50%;
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        /* ===== TABLE ===== */
+        .table-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #b8e018;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            padding: 10px 20px;
+            background: transparent;
+            color: var(--dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--dark);
+            background: rgba(201,243,29,0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .data-table td {
+            padding: 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--light);
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(201,243,29,0.05);
+        }
+
+        .property-img {
+            width: 60px;
+            height: 45px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .property-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .property-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .property-location {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.active { background: rgba(201,243,29,0.2); color: #5a7d00; }
+        .status-badge.pending { background: rgba(255,159,67,0.15); color: #e67e22; }
+        .status-badge.sold { background: rgba(255,71,87,0.1); color: #ff4757; }
+        .status-badge.approved { background: rgba(201,243,29,0.2); color: #5a7d00; }
+        .status-badge.rejected { background: rgba(255,71,87,0.1); color: #ff4757; }
+        .status-badge.under-review { background: rgba(255,159,67,0.15); color: #e67e22; }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .action-btn.edit { background: rgba(201,243,29,0.2); color: #5a7d00; }
+        .action-btn.delete { background: rgba(255,71,87,0.1); color: #ff4757; }
+        .action-btn.view { background: rgba(9,40,55,0.1); color: var(--dark); }
+        .action-btn.message { background: rgba(155,89,182,0.15); color: #9b59b6; }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* ===== SECTION CONTENT STYLES ===== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            text-align: center;
+        }
+
+        .info-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 16px;
+        }
+
+        .info-card h3 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .info-card p {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .form-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            max-width: 700px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(201,243,29,0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .settings-info p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: var(--border);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: var(--white);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+
+        /* ===== PROPERTY GRID ===== */
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .property-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: all 0.3s;
+        }
+
+        .property-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+
+        .property-card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .property-card-body {
+            padding: 20px;
+        }
+
+        .property-card-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .property-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .property-card-location {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .property-card-features {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .property-card-feature {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .property-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .property-card-agent {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .agent-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--dark);
+        }
+
+        .agent-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .property-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .property-card-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .property-card-btn.favorite {
+            background: rgba(255,71,87,0.1);
+            color: #ff4757;
+        }
+
+        .property-card-btn.favorite:hover {
+            background: #ff4757;
+            color: white;
+        }
+
+        .property-card-btn.view {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .property-card-btn.view:hover {
+            background: var(--dark);
+            color: var(--primary);
+        }
+
+        /* ===== MESSAGES / INQUIRIES ===== */
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px;
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .message-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .message-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .message-content h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .message-content p {
+            font-size: 13px;
+            color: var(--gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .message-meta {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .message-count {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            color: var(--dark);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 6px;
+            margin-left: auto;
+        }
+
+        /* ===== WISHLIST / FAVORITES ===== */
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .wishlist-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .wishlist-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+
+        .wishlist-remove {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff4757;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .wishlist-remove:hover {
+            background: #ff4757;
+            color: white;
+        }
+
+        /* ===== APPOINTMENT CARDS ===== */
+        .appointment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .appointment-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .appointment-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .appointment-date {
+            width: 70px;
+            height: 70px;
+            background: var(--primary);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .appointment-date .day {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .appointment-date .month {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dark);
+            text-transform: uppercase;
+        }
+
+        .appointment-info {
+            flex: 1;
+        }
+
+        .appointment-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .appointment-info p {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 4px;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* ===== PROFILE SECTION ===== */
+        .profile-header {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--dark);
+            flex-shrink: 0;
+        }
+
+        .profile-details h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .profile-details p {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 4px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 16px;
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .profile-stat p {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+            .property-grid { grid-template-columns: repeat(2, 1fr); }
+            .wishlist-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { left: -260px; }
+            .sidebar.open { left: 0; }
+            .main-content { margin-left: 0; }
+            .hamburger { display: block; }
+            .search-box input { width: 200px; }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.4);
+                z-index: 999;
+            }
+            .overlay.show { display: block; }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .topbar { padding: 12px 16px; }
+            .content-section { padding: 16px; }
+            .search-box { display: none; }
+            .user-info { display: none; }
+            .data-table { display: block; overflow-x: auto; }
+            .property-grid { grid-template-columns: 1fr; }
+            .wishlist-grid { grid-template-columns: 1fr; }
+            .profile-header { flex-direction: column; text-align: center; }
+            .appointment-card { flex-direction: column; text-align: center; }
+            .appointment-actions { width: 100%; justify-content: center; }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(9,40,55,0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(9,40,55,0.4); }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-section">
+    <a href="index.html">
+        <img src="images/logo-new.webp" alt="Logo" class="sidebar-logo">
+    </a>
+</div>
+
+        <nav class="nav-menu">
+            <div class="nav-item active" data-section="dashboard">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-section="my-properties">
+                <i class="fas fa-home"></i>
+                <span>My Properties</span>
+            </div>
+            <div class="nav-item" data-section="browse">
+                <i class="fas fa-search"></i>
+                <span>Browse</span>
+            </div>
+            <div class="nav-item" data-section="wishlist">
+                <i class="fas fa-heart"></i>
+                <span>Wishlist</span>
+            </div>
+            <div class="nav-item" data-section="inquiries">
+                <i class="fas fa-envelope"></i>
+                <span>Inquiries</span>
+            </div>
+            <div class="nav-item" data-section="appointments">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Appointments</span>
+            </div>
+
+            <div class="nav-item" data-section="profile">
+                <i class="fas fa-user"></i>
+                <span>My Profile</span>
+            </div>
+            <div class="nav-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </nav>
+
+        <div class="logout-section">
+            <button class="logout-btn" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content" id="mainContent">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">RT</div>
+                    <div class="user-info">
+                       <div class="user-name" id="userEmailDisplay"></div>
+                        <div class="user-role">Customer</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DASHBOARD SECTION ===== -->
+        <section class="content-section active" id="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon green"><i class="fas fa-home"></i></div>
+                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 2</span>
+                    </div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Saved Properties</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon blue"><i class="fas fa-envelope"></i></div>
+                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 3</span>
+                    </div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Active Inquiries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon orange"><i class="fas fa-calendar-check"></i></div>
+                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 1</span>
+                    </div>
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Upcoming Viewings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon purple"><i class="fas fa-handshake"></i></div>
+                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 1</span>
+                    </div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">Deals in Progress</div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Property Search Activity</h3>
+                        <select class="chart-filter">
+                            <option>This Month</option>
+                            <option>Last Month</option>
+                        </select>
+                    </div>
+                    <div class="chart-area">
+                        <div class="bar" style="height: 35%;"><span class="bar-value">12</span><span class="bar-label">Week 1</span></div>
+                        <div class="bar" style="height: 55%;"><span class="bar-value">18</span><span class="bar-label">Week 2</span></div>
+                        <div class="bar" style="height: 42%;"><span class="bar-value">14</span><span class="bar-label">Week 3</span></div>
+                        <div class="bar" style="height: 68%;"><span class="bar-value">22</span><span class="bar-label">Week 4</span></div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Interest by Type</h3>
+                    </div>
+                    <div class="pie-chart"></div>
+                    <div class="pie-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--primary);"></div> Residential (45%)</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--dark);"></div> Commercial (30%)</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: #ff9f43;"></div> Land (15%)</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: #e0e0e0;"></div> Industrial (10%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h3 class="chart-title">Recent Activity</h3>
+                    <button class="btn-outline" onclick="window.location.href='404.html'">
+    View All
+</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>Property</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Property Inquiry</strong></td>
+                            <td>Luxury Villa, Beverly Hills</td>
+                            <td>Jun 05, 2026</td>
+                            <td><span class="status-badge pending">Pending Response</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Viewing Scheduled</strong></td>
+                            <td>Modern Apartment, Manhattan</td>
+                            <td>Jun 03, 2026</td>
+                            <td><span class="status-badge active">Confirmed</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Offer Submitted</strong></td>
+                            <td>Beach House, Miami Beach</td>
+                            <td>May 28, 2026</td>
+                            <td><span class="status-badge under-review">Under Review</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Property Saved</strong></td>
+                            <td>Penthouse Suite, San Francisco</td>
+                            <td>May 25, 2026</td>
+                            <td><span class="status-badge active">Saved</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ===== MY PROPERTIES SECTION ===== -->
+        <section class="content-section" id="my-properties">
+            <div class="section-header">
+                <h2 class="section-title">My Properties</h2>
+                <button class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-plus"></i> List New Property
+</button>
+            </div>
+            <div class="property-grid">
+                <div class="property-card">
+                    <img src="images/resource/blog-thumb1.webp" class="property-card-img" alt="Property">
+                    <div class="property-card-body">
+                        <div class="property-card-price">$1,250,000</div>
+                        <div class="property-card-title">Luxury Villa</div>
+                        <div class="property-card-location"><i class="fas fa-map-marker-alt"></i> Beverly Hills, CA</div>
+                        <div class="property-card-features">
+                            <div class="property-card-feature"><i class="fas fa-bed"></i> 5 Beds</div>
+                            <div class="property-card-feature"><i class="fas fa-bath"></i> 4 Baths</div>
+                            <div class="property-card-feature"><i class="fas fa-ruler-combined"></i> 4,200 sqft</div>
+                        </div>
+                        <div class="property-card-footer">
+                            <div class="property-card-agent">
+                                <div class="agent-avatar">SJ</div>
+                                <div class="agent-name">Sarah Johnson</div>
+                            </div>
+                            <div class="property-card-actions">
+                                <button class="property-card-btn favorite" onclick="window.location.href='404.html'">
+    <i class="fas fa-heart"></i>
+</button>
+
+<button class="property-card-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="property-card">
+                    <img src="images/resource/blog-thumb2.webp" class="property-card-img" alt="Property">
+                    <div class="property-card-body">
+                        <div class="property-card-price">$680,000</div>
+                        <div class="property-card-title">Modern Apartment</div>
+                        <div class="property-card-location"><i class="fas fa-map-marker-alt"></i> Manhattan, NY</div>
+                        <div class="property-card-features">
+                            <div class="property-card-feature"><i class="fas fa-bed"></i> 3 Beds</div>
+                            <div class="property-card-feature"><i class="fas fa-bath"></i> 2 Baths</div>
+                            <div class="property-card-feature"><i class="fas fa-ruler-combined"></i> 1,800 sqft</div>
+                        </div>
+                        <div class="property-card-footer">
+                            <div class="property-card-agent">
+                                <div class="agent-avatar" style="background:var(--dark);color:var(--primary);">MC</div>
+                                <div class="agent-name">Michael Chen</div>
+                            </div>
+                            <div class="property-card-actions">
+                                <button class="property-card-btn favorite" onclick="window.location.href='404.html'">
+    <i class="fas fa-heart"></i>
+</button>
+
+<button class="property-card-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="property-card">
+                    <img src="images/resource/blog-thumb3.webp" class="property-card-img" alt="Property">
+                    <div class="property-card-body">
+                        <div class="property-card-price">$2,100,000</div>
+                        <div class="property-card-title">Beach House</div>
+                        <div class="property-card-location"><i class="fas fa-map-marker-alt"></i> Miami Beach, FL</div>
+                        <div class="property-card-features">
+                            <div class="property-card-feature"><i class="fas fa-bed"></i> 4 Beds</div>
+                            <div class="property-card-feature"><i class="fas fa-bath"></i> 3 Baths</div>
+                            <div class="property-card-feature"><i class="fas fa-ruler-combined"></i> 3,500 sqft</div>
+                        </div>
+                        <div class="property-card-footer">
+                            <div class="property-card-agent">
+                                <div class="agent-avatar" style="background:#9b59b6;color:white;">JW</div>
+                                <div class="agent-name">James Wilson</div>
+                            </div>
+                            <div class="property-card-actions">
+                                <button class="property-card-btn favorite" onclick="window.location.href='404.html'">
+    <i class="fas fa-heart"></i>
+</button>
+
+<button class="property-card-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== BROWSE SECTION ===== -->
+        <section class="content-section" id="browse">
+            <div class="section-header">
+                <h2 class="section-title">Browse Properties</h2>
+            </div>
+            <div class="property-grid">
+                <div class="property-card">
+                    <img src="images/resource/blog1-1.webp" class="property-card-img" alt="Property">
+                    <div class="property-card-body">
+                        <div class="property-card-price">$3,400,000</div>
+                        <div class="property-card-title">Office Complex</div>
+                        <div class="property-card-location"><i class="fas fa-map-marker-alt"></i> Chicago, IL</div>
+                        <div class="property-card-features">
+                            <div class="property-card-feature"><i class="fas fa-building"></i> Commercial</div>
+                            <div class="property-card-feature"><i class="fas fa-ruler-combined"></i> 12,000 sqft</div>
+                        </div>
+                        <div class="property-card-footer">
+                            <div class="property-card-agent">
+                                <div class="agent-avatar" style="background:#ff9f43;color:white;">ED</div>
+                                <div class="agent-name">Emily Davis</div>
+                            </div>
+                            <div class="property-card-actions">
+                                <button class="property-card-btn favorite" onclick="window.location.href='404.html'">
+    <i class="fas fa-heart"></i>
+</button>
+
+<button class="property-card-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="property-card">
+                    <img src="images/resource/blog1-2.webp" class="property-card-img" alt="Property">
+                    <div class="property-card-body">
+                        <div class="property-card-price">$4,500,000</div>
+                        <div class="property-card-title">Penthouse Suite</div>
+                        <div class="property-card-location"><i class="fas fa-map-marker-alt"></i> San Francisco, CA</div>
+                        <div class="property-card-features">
+                            <div class="property-card-feature"><i class="fas fa-bed"></i> 3 Beds</div>
+                            <div class="property-card-feature"><i class="fas fa-bath"></i> 3 Baths</div>
+                            <div class="property-card-feature"><i class="fas fa-ruler-combined"></i> 2,800 sqft</div>
+                        </div>
+                        <div class="property-card-footer">
+                            <div class="property-card-agent">
+                                <div class="agent-avatar">SJ</div>
+                                <div class="agent-name">Sarah Johnson</div>
+                            </div>
+                            <div class="property-card-actions">
+                                <button class="property-card-btn favorite" onclick="window.location.href='404.html'">
+    <i class="fas fa-heart"></i>
+</button>
+
+<button class="property-card-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="property-card">
+                    <img src="images/resource/blog1-b1.webp" class="property-card-img" alt="Property">
+                    <div class="property-card-body">
+                        <div class="property-card-price">$1,800,000</div>
+                        <div class="property-card-title">Retail Space</div>
+                        <div class="property-card-location"><i class="fas fa-map-marker-alt"></i> Austin, TX</div>
+                        <div class="property-card-features">
+                            <div class="property-card-feature"><i class="fas fa-building"></i> Commercial</div>
+                            <div class="property-card-feature"><i class="fas fa-ruler-combined"></i> 5,500 sqft</div>
+                        </div>
+                        <div class="property-card-footer">
+                            <div class="property-card-agent">
+                                <div class="agent-avatar" style="background:var(--dark);color:var(--primary);">MC</div>
+                                <div class="agent-name">Michael Chen</div>
+                            </div>
+                            <div class="property-card-actions">
+                                <button class="property-card-btn favorite" onclick="window.location.href='404.html'">
+    <i class="fas fa-heart"></i>
+</button>
+
+<button class="property-card-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== WISHLIST SECTION ===== -->
+        <section class="content-section" id="wishlist">
+            <div class="section-header">
+                <h2 class="section-title">My Wishlist</h2>
+                <button class="btn-outline" onclick="window.location.href='404.html'">
+    <i class="fas fa-share-alt"></i> Share Wishlist
+</button>
+            </div>
+            <div class="wishlist-grid">
+                <div class="wishlist-card">
+                    <button class="wishlist-remove" onclick="window.location.href='404.html'">
+    <i class="fas fa-times"></i>
+</button>
+                    <img src="images/resource/gallary-h1-3.webp" class="property-card-img" alt="Property">
+                    <div class="property-card-body">
+                        <div class="property-card-price">$1,250,000</div>
+                        <div class="property-card-title">Luxury Villa</div>
+                        <div class="property-card-location"><i class="fas fa-map-marker-alt"></i> Beverly Hills, CA</div>
+                        <div class="property-card-features">
+                            <div class="property-card-feature"><i class="fas fa-bed"></i> 5 Beds</div>
+                            <div class="property-card-feature"><i class="fas fa-bath"></i> 4 Baths</div>
+                        </div>
+                        <div class="property-card-footer">
+                            <span class="status-badge active">Available</span>
+                           <button class="btn-primary" style="padding:8px 16px;font-size:12px;"
+        onclick="window.location.href='404.html'">
+    Inquire
+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="wishlist-card">
+                    <button class="wishlist-remove" onclick="window.location.href='404.html'">
+    <i class="fas fa-times"></i>
+</button>
+                    <img src="images/resource/gallary-h1-4.webp" class="property-card-img" alt="Property">
+                    <div class="property-card-body">
+                        <div class="property-card-price">$4,500,000</div>
+                        <div class="property-card-title">Penthouse Suite</div>
+                        <div class="property-card-location"><i class="fas fa-map-marker-alt"></i> San Francisco, CA</div>
+                        <div class="property-card-features">
+                            <div class="property-card-feature"><i class="fas fa-bed"></i> 3 Beds</div>
+                            <div class="property-card-feature"><i class="fas fa-bath"></i> 3 Baths</div>
+                        </div>
+                        <div class="property-card-footer">
+                            <span class="status-badge active">Available</span>
+                           <button class="btn-primary" style="padding:8px 16px;font-size:12px;"
+        onclick="window.location.href='404.html'">
+    Inquire
+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="wishlist-card">
+                    <button class="wishlist-remove" onclick="window.location.href='404.html'">
+    <i class="fas fa-times"></i>
+</button>
+                    <img src="images/resource/gallary-h1-5.webp" class="property-card-img" alt="Property">
+                    <div class="property-card-body">
+                        <div class="property-card-price">$2,100,000</div>
+                        <div class="property-card-title">Beach House</div>
+                        <div class="property-card-location"><i class="fas fa-map-marker-alt"></i> Miami Beach, FL</div>
+                        <div class="property-card-features">
+                            <div class="property-card-feature"><i class="fas fa-bed"></i> 4 Beds</div>
+                            <div class="property-card-feature"><i class="fas fa-bath"></i> 3 Baths</div>
+                        </div>
+                        <div class="property-card-footer">
+                            <span class="status-badge pending">Under Offer</span>
+                           <button class="btn-primary" style="padding:8px 16px;font-size:12px;"
+        onclick="window.location.href='404.html'">
+    Inquire
+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== INQUIRIES SECTION ===== -->
+<section class="content-section" id="inquiries">
+    
+    <div class="section-header">
+        <h2 class="section-title">My Inquiries</h2>
+        <button class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-plus"></i> New Inquiry
+</button>   
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="cards-grid">
+
+        <div class="info-card">
+            <div class="info-card-icon"
+                style="background: rgba(201,243,29,0.2); color:#5a7d00;">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+            <h3>12</h3>
+            <p>Total Inquiries</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-icon"
+                style="background: rgba(9,40,55,0.1); color:var(--dark);">
+                <i class="fas fa-reply"></i>
+            </div>
+            <h3>8</h3>
+            <p>Responded</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-icon"
+                style="background: rgba(255,159,67,0.15); color:#e67e22;">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h3>4</h3>
+            <p>Pending</p>
+        </div>
+
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="table-card">
+
+        <table class="data-table">
+
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Agent</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>
+                        <div class="property-info">
+                            <img src="images/resource/ap-1.webp"
+                                 class="property-img">
+                            <div>
+                                <div class="property-name">Luxury Villa</div>
+                                <div class="property-location">
+                                    Beverly Hills, CA
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Sarah Johnson</td>
+                    <td>Interested in scheduling a viewing.</td>
+                    <td>Jun 05, 2026</td>
+                    <td>
+                        <span class="status-badge pending">
+                            Pending
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                           <button class="action-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+
+<button class="action-btn message" onclick="window.location.href='404.html'">
+    <i class="fas fa-comment"></i>
+</button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="property-info">
+                            <img src="images/resource/ap-2.webp"
+                                 class="property-img">
+                            <div>
+                                <div class="property-name">Modern Apartment</div>
+                                <div class="property-location">
+                                    Manhattan, NY
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Michael Chen</td>
+                    <td>Can you provide more photos?</td>
+                    <td>Jun 02, 2026</td>
+                    <td>
+                        <span class="status-badge active">
+                            Replied
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                           <button class="action-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+
+<button class="action-btn message" onclick="window.location.href='404.html'">
+    <i class="fas fa-comment"></i>
+</button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="property-info">
+                            <img src="images/resource/ap-3.webp"
+                                 class="property-img">
+                            <div>
+                                <div class="property-name">Beach House</div>
+                                <div class="property-location">
+                                    Miami Beach, FL
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>James Wilson</td>
+                    <td>What is the lowest offer accepted?</td>
+                    <td>May 28, 2026</td>
+                    <td>
+                        <span class="status-badge active">
+                            Replied
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                           <button class="action-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+
+<button class="action-btn message" onclick="window.location.href='404.html'">
+    <i class="fas fa-comment"></i>
+</button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="property-info">
+                            <img src="images/resource/ap-4.webp"
+                                 class="property-img">
+                            <div>
+                                <div class="property-name">Penthouse Suite</div>
+                                <div class="property-location">
+                                    San Francisco, CA
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Sarah Johnson</td>
+                    <td>Is parking included in the price?</td>
+                    <td>May 20, 2026</td>
+                    <td>
+                        <span class="status-badge active">
+                            Replied
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                           <button class="action-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+
+<button class="action-btn message" onclick="window.location.href='404.html'">
+    <i class="fas fa-comment"></i>
+</button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="property-info">
+                            <img src="images/resource/ap-5.webp"
+                                 class="property-img">
+                            <div>
+                                <div class="property-name">Family Home</div>
+                                <div class="property-location">
+                                    Austin, TX
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Emma Davis</td>
+                    <td>Interested in financing options.</td>
+                    <td>May 18, 2026</td>
+                    <td>
+                        <span class="status-badge pending">
+                            Pending
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                           <button class="action-btn view" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i>
+</button>
+
+<button class="action-btn message" onclick="window.location.href='404.html'">
+    <i class="fas fa-comment"></i>
+</button>
+                        </div>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+
+</section> 
+
+<!-- ===== APPOINTMENTS SECTION ===== -->
+<section class="content-section" id="appointments">
+
+    <div class="section-header">
+        <h2 class="section-title">My Appointments</h2>
+
+       <button class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-plus"></i> Schedule Appointment
+</button>
+
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="cards-grid">
+
+        <div class="info-card">
+            <div class="info-card-icon"
+                 style="background:rgba(201,243,29,0.2);color:#5a7d00;">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <h3>08</h3>
+            <p>Total Appointments</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-icon"
+                 style="background:rgba(9,40,55,0.1);color:var(--dark);">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h3>04</h3>
+            <p>Upcoming</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-icon"
+                 style="background:rgba(255,159,67,0.15);color:#e67e22;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>04</h3>
+            <p>Completed</p>
+        </div>
+
+    </div>
+
+    <!-- Appointment List -->
+    <div class="appointment-list">
+
+        <!-- Appointment 1 -->
+        <div class="appointment-card">
+
+            <div class="appointment-date">
+                <div class="day">15</div>
+                <div class="month">Jun</div>
+            </div>
+
+            <div class="appointment-info">
+                <h4>Luxury Villa Property Viewing</h4>
+                <p><i class="fas fa-map-marker-alt"></i> Beverly Hills, CA</p>
+                <p><i class="fas fa-user"></i> Agent: Sarah Johnson</p>
+                <p><i class="fas fa-clock"></i> 10:00 AM - 11:00 AM</p>
+            </div>
+
+            <span class="status-badge active">
+                Confirmed
+            </span>
+
+            <div class="appointment-actions">
+               <button class="btn-outline" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i> View
+</button>
+
+<button class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-video"></i> Join
+</button>
+            </div>
+
+        </div>
+
+        <!-- Appointment 2 -->
+        <div class="appointment-card">
+
+            <div class="appointment-date">
+                <div class="day">18</div>
+                <div class="month">Jun</div>
+            </div>
+
+            <div class="appointment-info">
+                <h4>Modern Apartment Consultation</h4>
+                <p><i class="fas fa-map-marker-alt"></i> Manhattan, NY</p>
+                <p><i class="fas fa-user"></i> Agent: Michael Chen</p>
+                <p><i class="fas fa-clock"></i> 02:00 PM - 03:00 PM</p>
+            </div>
+
+            <span class="status-badge pending">
+                Pending
+            </span>
+
+            <div class="appointment-actions">
+                <button class="btn-outline" onclick="window.location.href='404.html'">
+    <i class="fas fa-edit"></i> Reschedule
+</button>
+
+<button class="btn-outline" onclick="window.location.href='404.html'">
+    <i class="fas fa-times"></i> Cancel
+</button>
+            </div>
+
+        </div>
+
+        <!-- Appointment 3 -->
+        <div class="appointment-card">
+
+            <div class="appointment-date">
+                <div class="day">22</div>
+                <div class="month">Jun</div>
+            </div>
+
+            <div class="appointment-info">
+                <h4>Beach House Inspection</h4>
+                <p><i class="fas fa-map-marker-alt"></i> Miami Beach, FL</p>
+                <p><i class="fas fa-user"></i> Agent: James Wilson</p>
+                <p><i class="fas fa-clock"></i> 11:30 AM - 12:30 PM</p>
+            </div>
+
+            <span class="status-badge active">
+                Confirmed
+            </span>
+
+            <div class="appointment-actions">
+           <button class="btn-outline" onclick="window.location.href='404.html'">
+    <i class="fas fa-eye"></i> Details
+</button>
+
+<button class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-phone"></i> Contact
+</button>
+            </div>
+
+        </div>
+
+        <!-- Appointment 4 -->
+        <div class="appointment-card">
+
+            <div class="appointment-date">
+                <div class="day">05</div>
+                <div class="month">May</div>
+            </div>
+
+            <div class="appointment-info">
+                <h4>Penthouse Suite Viewing</h4>
+                <p><i class="fas fa-map-marker-alt"></i> San Francisco, CA</p>
+                <p><i class="fas fa-user"></i> Agent: Emma Davis</p>
+                <p><i class="fas fa-clock"></i> 01:00 PM - 02:00 PM</p>
+            </div>
+
+            <span class="status-badge approved">
+                Completed
+            </span>
+
+            <div class="appointment-actions">
+            <button class="btn-outline" onclick="window.location.href='404.html'">
+    <i class="fas fa-file-alt"></i> Report
+</button>
+
+<button class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-star"></i> Review
+</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===== MY PROFILE SECTION ===== -->
+<section class="content-section" id="profile">
+
+    <div class="section-header">
+        <h2 class="section-title">My Profile</h2>
+
+        <button class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-save"></i> Save Changes
+</button>
+
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+
+        <div class="profile-avatar-large">
+            RT
+        </div>
+
+        <div class="profile-details">
+            <h2>Robert Taylor</h2>
+
+            <p>
+                <i class="fas fa-envelope"></i>
+                robert.taylor@email.com
+            </p>
+
+            <p>
+                <i class="fas fa-phone"></i>
+                +1 (555) 123-4567
+            </p>
+
+            <p>
+                <i class="fas fa-map-marker-alt"></i>
+                Beverly Hills, California
+            </p>
+
+            <div class="profile-stats">
+
+                <div class="profile-stat">
+                    <h3>12</h3>
+                    <p>Inquiries</p>
+                </div>
+
+                <div class="profile-stat">
+                    <h3>8</h3>
+                    <p>Appointments</p>
+                </div>
+
+                <div class="profile-stat">
+                    <h3>5</h3>
+                    <p>Wishlist</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Edit Profile Form -->
+    <div class="form-card">
+
+        <h3 class="chart-title" style="margin-bottom:25px;">
+            Personal Information
+        </h3>
+
+        <form>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" value="Robert">
+                </div>
+
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" value="Taylor">
+                </div>
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email"
+                           value="robert.taylor@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text"
+                           value="+1 (555) 123-4567">
+                </div>
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" value="1990-05-15">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select>
+                        <option selected>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text"
+                       value="123 Palm Street, Beverly Hills, CA">
+            </div>
+
+            <div class="form-group">
+                <label>About Me</label>
+                <textarea rows="5">
+Experienced property buyer interested in luxury villas, apartments, and commercial investments.
+                </textarea>
+            </div>
+
+            <button type="button" class="btn-primary"
+        onclick="window.location.href='404.html'">
+    Update Profile
+</button>
+
+        </form>
+
+    </div>
+
+</section>
+
+<!-- ===== SETTINGS SECTION ===== -->
+<section class="content-section" id="settings">
+
+    <div class="section-header">
+        <h2 class="section-title">Settings</h2>
+
+       <button class="btn-primary" onclick="window.location.href='404.html'">
+    <i class="fas fa-save"></i> Save Settings
+</button>
+
+    </div>
+
+    <div class="table-card">
+
+        <!-- Account Settings -->
+        <div class="settings-item">
+            <div class="settings-info">
+                <h4>Email Notifications</h4>
+                <p>Receive updates about inquiries and appointments.</p>
+            </div>
+
+            <div class="toggle-switch active"></div>
+        </div>
+
+        <div class="settings-item">
+            <div class="settings-info">
+                <h4>SMS Notifications</h4>
+                <p>Receive SMS alerts for important updates.</p>
+            </div>
+
+            <div class="toggle-switch"></div>
+        </div>
+
+        <div class="settings-item">
+            <div class="settings-info">
+                <h4>Marketing Emails</h4>
+                <p>Receive promotional offers and property suggestions.</p>
+            </div>
+
+            <div class="toggle-switch active"></div>
+        </div>
+
+        <div class="settings-item">
+            <div class="settings-info">
+                <h4>Two-Factor Authentication</h4>
+                <p>Secure your account with an additional verification step.</p>
+            </div>
+
+            <div class="toggle-switch active"></div>
+        </div>
+
+        <div class="settings-item">
+            <div class="settings-info">
+                <h4>Public Profile Visibility</h4>
+                <p>Allow agents to view your public profile information.</p>
+            </div>
+
+            <div class="toggle-switch"></div>
+        </div>
+
+    </div>
+
+    <!-- Change Password -->
+    <div class="form-card" style="margin-top:30px;">
+
+        <h3 class="chart-title" style="margin-bottom:25px;">
+            Change Password
+        </h3>
+
+        <form>
+
+            <div class="form-group">
+                <label>Current Password</label>
+                <input type="password"
+                       placeholder="Enter current password">
+            </div>
+
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password"
+                       placeholder="Enter new password">
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password"
+                       placeholder="Confirm new password">
+            </div>
+
+           <button type="button" class="btn-primary"
+        onclick="window.location.href='404.html'">
+    Update Password
+</button>
+
+        </form>
+
+    </div>
+
+    <!-- Preferences -->
+    <div class="table-card" style="margin-top:30px;">
+
+        <h3 class="chart-title" style="margin-bottom:20px;">
+            Preferences
+        </h3>
+
+        <div class="form-row">
+
+            <div class="form-group">
+                <label>Preferred Property Type</label>
+                <select>
+                    <option>Residential</option>
+                    <option>Commercial</option>
+                    <option>Land</option>
+                    <option>Industrial</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Preferred Budget Range</label>
+                <select>
+                    <option>$100K - $500K</option>
+                    <option>$500K - $1M</option>
+                    <option>$1M - $5M</option>
+                    <option>$5M+</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label>Preferred Location</label>
+            <input type="text"
+                   placeholder="Enter preferred city or state">
+        </div>
+
+       <button class="btn-primary" onclick="window.location.href='404.html'">
+    Save Preferences
+</button>
+
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="table-card" style="margin-top:30px;border-left:4px solid #ff4757;">
+
+        <h3 class="chart-title"
+            style="color:#ff4757;margin-bottom:20px;">
+            Danger Zone
+        </h3>
+
+        <p style="margin-bottom:20px;color:#6c757d;">
+            Once you delete your account, there is no going back.
+            Please be certain.
+        </p>
+
+       <button class="btn-outline"
+        style="border-color:#ff4757;color:#ff4757;"
+        onclick="window.location.href='404.html'">
+    <i class="fas fa-trash"></i>
+    Delete Account
+</button>
+
+    </div>
+
+</section>
+
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const navItems = document.querySelectorAll(".nav-item");
+    const sections = document.querySelectorAll(".content-section");
+    const pageTitle = document.getElementById("pageTitle");
+
+    navItems.forEach(item => {
+
+        item.addEventListener("click", function () {
+
+            navItems.forEach(nav => nav.classList.remove("active"));
+
+            this.classList.add("active");
+
+            const sectionId = this.getAttribute("data-section");
+
+            sections.forEach(section => {
+                section.classList.remove("active");
+            });
+
+            const activeSection = document.getElementById(sectionId);
+
+            if(activeSection){
+                activeSection.classList.add("active");
+            }
+
+            pageTitle.innerText =
+                this.querySelector("span").innerText;
+
+            if(window.innerWidth < 992){
+                sidebar.classList.remove("open");
+                overlay.classList.remove("show");
+            }
+        });
+
+    });
+
+});
+
+const hamburger = document.getElementById("hamburger");
+
+hamburger.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
+});
+
+overlay.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
+});
+</script>
+                                        
+
+<script>
+    document.querySelectorAll(".toggle-switch").forEach(toggle => {
+    toggle.addEventListener("click", () => {
+        toggle.classList.toggle("active");
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const email = localStorage.getItem("userEmail");
+    const loginTime = localStorage.getItem("loginTime");
+
+    document.getElementById("userEmailDisplay").innerText =
+        email ? email : "Guest User";
+
+    document.getElementById("loginTimeDisplay").innerText =
+        loginTime ? "Login: " + loginTime : "Not Logged In";
+});
+
+function handleLogout() {
+
+    // Clear login session
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("loginTime");
+
+    // Redirect to login page
+    window.location.href = "login.html";
+}
+
+</script>
+</body>
+</html>
